@@ -34,6 +34,7 @@ async function run() {
       .db("thedailyblog")
       .collection("recentblog");
     const allBlogCollection = client.db("thedailyblog").collection("allblogs");
+    const wishlistCollection = client.db("thedailyblog").collection("wishlist");
 
     app.get("/recentblog", async (req, res) => {
       const result = await recentBlogCollection.find().toArray();
@@ -43,9 +44,16 @@ async function run() {
     // GET DATA FOR ALL BLOGS //
     app.get("/allblogs", async (req, res) => {
       const result = await allBlogCollection.find().toArray();
-      console.log(result);
       res.send(result);
     });
+
+    // GET DATA FROM WISHLIST //
+    // app.get("/wishlist/:email", async (req, res) => {    
+    //   const email = req.params.email;
+    //   const query = {email};
+    //   const result = await wishlistCollection.find(query).toArray();
+    //   res.send(result);
+    // });
 
     // app.get("/allblogs/:email", async (req, res) => {
     //   const email = req.params.email;
@@ -56,9 +64,16 @@ async function run() {
     // });
 
     app.post("/allblogs", async (req, res) => {
-      const jobData = req.body;
-      const result = await allBlogCollection.insertOne(jobData);
-      console.log(result);
+      const allBlogData = req.body;
+      const result = await allBlogCollection.insertOne(allBlogData);
+      res.send(result);
+    });
+
+    //ADD WISHLIST //
+
+    app.post("/wishlist", async (req, res) => {
+      const wishlistData = req.body;
+      const result = await wishlistCollection.insertOne(wishlistData);
       res.send(result);
     });
 

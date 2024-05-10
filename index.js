@@ -48,12 +48,12 @@ async function run() {
     });
 
     // GET DATA FROM WISHLIST //
-    // app.get("/wishlist/:email", async (req, res) => {    
-    //   const email = req.params.email;
-    //   const query = {email};
-    //   const result = await wishlistCollection.find(query).toArray();
-    //   res.send(result);
-    // });
+    app.get("/wishlist/:email", async (req, res) => {    
+      const email = req.params.email;
+      const query = {email};
+      const result = await wishlistCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // app.get("/allblogs/:email", async (req, res) => {
     //   const email = req.params.email;

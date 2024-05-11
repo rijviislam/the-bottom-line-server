@@ -66,6 +66,11 @@ async function run() {
       const result = await allBlogCollection.find().toArray();
       res.send(result);
     });
+    // GET THE BLOG FOR FEATURE BLOG PAGE //
+    app.get("/featureblog", async (req, res) => {
+      const result = await allBlogCollection.find().toArray();
+      res.send(result);
+    });
     // GET MY BLOGS
 // This is not working for same path //
     app.get("/allblogs", async (req, res) => {

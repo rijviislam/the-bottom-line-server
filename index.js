@@ -35,6 +35,7 @@ async function run() {
       .collection("recentblog");
     const allBlogCollection = client.db("thedailyblog").collection("allblogs");
     const wishlistCollection = client.db("thedailyblog").collection("wishlist");
+    const commentCollection = client.db("thedailyblog").collection("comments");
 
     app.get("/recentblog", async (req, res) => {
       const result = await recentBlogCollection.find().toArray();
@@ -42,15 +43,24 @@ async function run() {
       res.send(result);
     });
     // GET DATA FOR ALL BLOGS //
+    // THIS FILTER AND SEARCH FUNCTIONALITY NOT WORKING //
     app.get("/allblogs", async (req, res) => {
+      const filter = req.query.filter;
+      const search = req.query.search;
+      const query = {
+        title: {$regex: search, $options: 'i'}
+      };
+      if (filter) {
+        query.category = filter;
+      }
       const result = await allBlogCollection.find().toArray();
       res.send(result);
     });
 
     // GET DATA FROM WISHLIST //
-    app.get("/wishlist/:email", async (req, res) => {    
+    app.get("/wishlist/:email", async (req, res) => {
       const email = req.params.email;
-      const query = {email};
+      const query = { email };
       const result = await wishlistCollection.find(query).toArray();
       res.send(result);
     });
@@ -63,19 +73,37 @@ async function run() {
     //   res, send(result);
     // });
 
+    app.get('/allblogs/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await allBlogCollection.findOne(query);
+      res.send(result);
+    })
+
     app.post("/allblogs", async (req, res) => {
       const allBlogData = req.body;
       const result = await allBlogCollection.insertOne(allBlogData);
       res.send(result);
     });
+    app.post("/blogdetails", async (req, res) => {
+      const comment = req.body;
+      const result = await commentCollection.insertOne(comment);
+      res.send(result);
+    });
 
     //ADD WISHLIST //
 
-    app.post("/wishlist", async (req, res) => {
-      const wishlistData = req.body;
-      const result = await wishlistCollection.insertOne(wishlistData);
-      res.send(result);
-    });
+    // app.post("/wishlist", async (req, res) => {
+    //   const wishlistData = req.body;
+
+    //   // check the duplication//
+    //   const query = { email: wishlistData.email};
+
+    //   const   areadyHave  = await wishlistCollection.findOne(query);
+    //   return console.log(areadyHave)
+    //   const result = await wishlistCollection.insertOne(wishlistData);
+    //   res.send(result);
+    // });
 
     await client.db("admin").command({ ping: 1 });
     console.log(

@@ -43,7 +43,7 @@ async function run() {
       res.send(result);
     });
     // GET DATA FOR ALL BLOGS //
-    // THIS FILTER AND SEARCH FUNCTIONALITY NOT WORKING //
+    // THIS FILTER AND SEARCH FUNCTIONALITY NOT WORKING  BEACUASE THE SAME PATH AND FILTER AFUNCTION  SEARCH //
     app.get("/allblogs", async (req, res) => {
       const filter = req.query.filter;
       const search = req.query.search;
@@ -56,13 +56,13 @@ async function run() {
       const result = await allBlogCollection.find().toArray();
       res.send(result);
     });
-    // GET THE BLOG DETAILS //
+    // GET THE BLOG COMMENT COLLECTION DETAILS //
     app.get("/blogdetails", async (req, res) => {
       const result = await commentCollection.find().toArray();
       res.send(result);
     });
     // GET THE BLOG DETAILS //
-    app.get("/updateblog", async (req, res) => {
+    app.get("/updateblogpage", async (req, res) => {
       const result = await allBlogCollection.find().toArray();
       res.send(result);
     });
@@ -109,6 +109,27 @@ async function run() {
     app.post("/blogdetails", async (req, res) => {
       const comment = req.body;
       const result = await commentCollection.insertOne(comment);
+      res.send(result);
+    });
+
+    app.put("/blogupdated/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedId = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateBlog = req.body;
+      const updateMyBlog = {
+        $set: {
+          title: updateBlog.title,
+          category: updateBlog.category,
+          shortdescription: updateBlog.shortdescription,
+          longshortdescription: updateBlog.longshortdescription,
+        },
+      };
+      const result = await allBlogCollection.updateOne(
+        updatedId,
+        updateMyBlog,
+        options
+      );
       res.send(result);
     });
 

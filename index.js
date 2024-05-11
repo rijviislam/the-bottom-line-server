@@ -48,7 +48,7 @@ async function run() {
       const filter = req.query.filter;
       const search = req.query.search;
       const query = {
-        title: {$regex: search, $options: 'i'}
+        title: { $regex: search, $options: "i" },
       };
       if (filter) {
         query.category = filter;
@@ -56,7 +56,28 @@ async function run() {
       const result = await allBlogCollection.find().toArray();
       res.send(result);
     });
-
+    // GET THE BLOG DETAILS //
+    app.get("/blogdetails", async (req, res) => {
+      const result = await commentCollection.find().toArray();
+      res.send(result);
+    });
+    // GET THE BLOG DETAILS //
+    app.get("/updateblog", async (req, res) => {
+      const result = await allBlogCollection.find().toArray();
+      res.send(result);
+    });
+    // GET MY BLOGS
+// This is not working for same path //
+    app.get("/allblogs", async (req, res) => {
+      const email = req.query.email;
+      if (email) {
+        const result = await allBlogCollection.find({ email: email }).toArray();
+        res.send(result);
+      } else {
+        const result2 = await allBlogCollection.find().toArray();
+        res.send(result2);
+      }
+    });
     // GET DATA FROM WISHLIST //
     app.get("/wishlist/:email", async (req, res) => {
       const email = req.params.email;
@@ -73,12 +94,12 @@ async function run() {
     //   res, send(result);
     // });
 
-    app.get('/allblogs/:id', async(req, res) => {
+    app.get("/allblogs/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await allBlogCollection.findOne(query);
       res.send(result);
-    })
+    });
 
     app.post("/allblogs", async (req, res) => {
       const allBlogData = req.body;

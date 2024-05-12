@@ -39,7 +39,6 @@ async function run() {
 
     app.get("/recentblog", async (req, res) => {
       const result = await recentBlogCollection.find().toArray();
-      //   console.log(result)
       res.send(result);
     });
     // GET DATA FOR ALL BLOGS //
@@ -144,9 +143,16 @@ async function run() {
     app.post("/wishlist", async (req, res) => {
       const wishlistData = req.body;
       const result = await wishlistCollection.insertOne(wishlistData)
-      console.log(result)
-      // res.send(result)
+      res.send(result)
    
+    });
+
+    // WISHLIST REMOVE //
+    app.delete("/wishlist/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await wishlistCollection.deleteOne(query);
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });

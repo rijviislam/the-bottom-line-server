@@ -88,6 +88,7 @@ async function run() {
       const email = req.params.email;
       const query = { email };
       const result = await wishlistCollection.find(query).toArray();
+      console.log(result);
       res.send(result);
     });
 
@@ -140,17 +141,13 @@ async function run() {
 
     //ADD WISHLIST //
 
-    // app.post("/wishlist", async (req, res) => {
-    //   const wishlistData = req.body;
-
-    //   // check the duplication//
-    //   const query = { email: wishlistData.email};
-
-    //   const   areadyHave  = await wishlistCollection.findOne(query);
-    //   return console.log(areadyHave)
-    //   const result = await wishlistCollection.insertOne(wishlistData);
-    //   res.send(result);
-    // });
+    app.post("/wishlist", async (req, res) => {
+      const wishlistData = req.body;
+      const result = await wishlistCollection.insertOne(wishlistData)
+      console.log(result)
+      // res.send(result)
+   
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(

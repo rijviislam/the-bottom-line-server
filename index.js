@@ -56,9 +56,13 @@ async function run() {
       res.send(result);
     });
     // GET THE BLOG COMMENT COLLECTION DETAILS //
-    app.get("/blogdetails", async (req, res) => {
-      const result = await commentCollection.find().toArray();
-      res.send(result);
+    app.get("/blogdetails/:blogId", async (req, res) => {
+      const id = req.params.blogId;
+      console.log(id)
+      const result = await commentCollection.find({blogId: id }).toArray();
+    console.log("Comments found:", result);
+
+    res.send(result);
     });
     // GET THE BLOG DETAILS //
     app.get("/updateblogpage", async (req, res) => {
@@ -87,7 +91,6 @@ async function run() {
       const email = req.params.email;
       const query = { email };
       const result = await wishlistCollection.find(query).toArray();
-      console.log(result);
       res.send(result);
     });
 
@@ -95,7 +98,6 @@ async function run() {
     //   const email = req.params.email;
     //   const query = { email };
     //   const result = await recentBlogCollection.find(query).toArray();
-    //   console.log(result);
     //   res, send(result);
     // });
 

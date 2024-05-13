@@ -58,10 +58,7 @@ async function run() {
     // GET THE BLOG COMMENT COLLECTION DETAILS //
     app.get("/blogdetails/:blogId", async (req, res) => {
       const id = req.params.blogId;
-      console.log(id)
       const result = await commentCollection.find({blogId: id }).toArray();
-    console.log("Comments found:", result);
-
     res.send(result);
     });
     // GET THE BLOG DETAILS //
@@ -74,32 +71,17 @@ async function run() {
       const result = await allBlogCollection.find().toArray();
       res.send(result);
     });
-    // GET MY BLOGS
-// This is not working for same path //
-    app.get("/allblogs", async (req, res) => {
-      const email = req.query.email;
-      if (email) {
-        const result = await allBlogCollection.find({ email: email }).toArray();
-        res.send(result);
-      } else {
-        const result2 = await allBlogCollection.find().toArray();
-        res.send(result2);
-      }
-    });
+
+
     // GET DATA FROM WISHLIST //
-    app.get("/wishlist/:email", async (req, res) => {
-      const email = req.params.email;
-      const query = { email };
+    app.get("/wishlist/:wishlistuseremail", async (req, res) => {
+      const wishlistuseremail = req.params.wishlistuseremail;
+      const query = { wishlistuseremail : wishlistuseremail};
       const result = await wishlistCollection.find(query).toArray();
       res.send(result);
+ 
     });
 
-    // app.get("/allblogs/:email", async (req, res) => {
-    //   const email = req.params.email;
-    //   const query = { email };
-    //   const result = await recentBlogCollection.find(query).toArray();
-    //   res, send(result);
-    // });
 
     app.get("/allblogs/:id", async (req, res) => {
       const id = req.params.id;

@@ -36,24 +36,32 @@ const client = new MongoClient(uri, {
 });
 
 // MIDDLEWARE //
+
 const logger = (req, res, next) => {
   console.log("log Info:", req.method, req.url);
   next();
 };
 const verifyToken = (req, res, next) => {
-  const token = req?.cookies.token;
+  const token = req.cookies.token;
   if (!token) {
-    return res.status(401).send({ message: "UnAutgorized Access!" });
+    return res.status(401).send({ message: "Unauthorized Access!" });
   }
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decode) => {
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).send({ message: "'Unautgorized Access!'" });
+      if (err.name === 'TokenExpiredError') { 
+        return res.status(401).send({ message: "Token expired. Please login again" });
+      }
+      return res.status(401).send({ message: "Unauthorized Access!" });
     }
-    req.user = decode;
+
+    req.user = decoded;
     next();
   });
-  // next();
 };
+
+
+
 async function run() {
   try {
     const recentBlogCollection = client
@@ -66,7 +74,7 @@ async function run() {
     // JWT IMPLEMENT //
     app.post("/jwt", async (req, res) => {
       const user = req.body;
-      console.log("user for token", user);
+      // console.log("user for token", user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "2d",
       });
@@ -80,7 +88,7 @@ async function run() {
     });
     app.post("/logout", async (req, res) => {
       const user = req.body;
-      console.log("logging out", user);
+      // console.log("logging out", user);
       res.clearCookie("token", { maxAge: 0 }).send({ success: true });
     });
 
@@ -120,17 +128,18 @@ async function run() {
     });
 
     // GET DATA FROM WISHLIST //
+
     app.get(
       "/wishlist/:wishlistuseremail",
       logger,
       verifyToken,
       async (req, res) => {
-        const wishlistuseremail = req.params.wishlistuseremail;
-        console.log("Owner!", req.user);
-        if(req.user.email !== req.query.wishlistuseremail) {
-          return res.status(403).send({message: "Forbidden Access!"})
+        const wishlistuseremail = req.params.wishlistuseremail.toLowerCase(); // Case-insensitive comparison
+        if (req.user.email.toLowerCase() !== wishlistuseremail) {
+          return res.status(403).send({ message: "Forbidden Access!" });
         }
-        const query = { wishlistuseremail: wishlistuseremail };
+    
+        const query = { wishlistuseremail };
         const result = await wishlistCollection.find(query).toArray();
         res.send(result);
       }

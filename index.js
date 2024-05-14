@@ -49,8 +49,10 @@ const verifyToken = (req, res, next) => {
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      if (err.name === 'TokenExpiredError') { 
-        return res.status(401).send({ message: "Token expired. Please login again" });
+      if (err.name === "Token Expired Error") {
+        return res
+          .status(401)
+          .send({ message: "Token expired. Please login again" });
       }
       return res.status(401).send({ message: "Unauthorized Access!" });
     }
@@ -59,8 +61,6 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
-
-
 
 async function run() {
   try {
@@ -128,7 +128,6 @@ async function run() {
     });
 
     // GET DATA FROM WISHLIST //
-
     app.get(
       "/wishlist/:wishlistuseremail",
       logger,
@@ -138,7 +137,7 @@ async function run() {
         if (req.user.email.toLowerCase() !== wishlistuseremail) {
           return res.status(403).send({ message: "Forbidden Access!" });
         }
-    
+
         const query = { wishlistuseremail };
         const result = await wishlistCollection.find(query).toArray();
         res.send(result);

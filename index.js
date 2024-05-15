@@ -18,7 +18,12 @@ const app = express();
 // }
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://blog-site-7a0ec.web.app",
+      "https://blog-site-7a0ec.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
@@ -61,6 +66,11 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
+const cookieOption = {
+  httpOnly: true,
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  secure: process.env.NODE_ENV === "production" ? true : false,
+};
 
 async function run() {
   try {
@@ -78,18 +88,12 @@ async function run() {
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "2d",
       });
-      res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
-        .send({ success: true });
+      res.cookie("token", token, cookieOption).send({ success: true });
     });
     app.post("/logout", async (req, res) => {
       const user = req.body;
       // console.log("logging out", user);
-      res.clearCookie("token", { maxAge: 0 }).send({ success: true });
+      res.clearCookie("token", { ...cookieOption, maxAge: 0 }).send({ success: true });
     });
 
     app.get("/recentblog", async (req, res) => {
@@ -199,7 +203,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
